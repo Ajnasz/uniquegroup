@@ -1,53 +1,61 @@
 /*global require: true, exports: true*/
-var FileGroup = function (files) {
-    this.files = [];
-    if (files) {
-        this.add(files);
+var UniqueGroup = function (items) {
+    this.items = [];
+    if (items) {
+        this.add(items);
     }
 };
-FileGroup.prototype = {
-    add: function (files) {
-        if (Object.prototype.toString.apply(files) !== '[object Array]') {
-            files = [files];
+UniqueGroup.prototype = {
+    add: function (items) {
+        if (Object.prototype.toString.apply(items) !== '[object Array]') {
+            items = [items];
         }
-        files.forEach(function (file) {
-            if (file instanceof FileGroup) {
-                file = file.files;
+        items.forEach(function (item) {
+            if (item instanceof this.constructor) {
+                item = item.items;
             }
-            this.files = this.files.concat(file);
+            this.items = this.items.concat(item);
         }.bind(this));
         this._makeUnique();
     },
     _makeUnique: function () {
-        var files = [], hash = {};
-        this.files.forEach(function (file) {
-            if (!hash[file]) {
-                files.push(file);
-                hash[file] = true;
+        var items = [], hash = {};
+        this.items.forEach(function (item) {
+            if (!hash[item]) {
+                items.push(item);
+                hash[item] = true;
             }
         });
-        this.files = files;
-    },
-    generate: function (cb) {
-        var output = '',
-            me = this,
-            index = 0, read,
-            fs = require('fs');
-        read = function read() {
-            fs.readFile(me.files[index], function (err, data) {
-                if (err) {
-                    throw err;
-                }
-                output += data;
-                index += 1;
-                if (index < me.files.length) {
-                    read();
-                } else {
-                    cb(output);
-                }
-            });
-        };
-        read();
+        this.items = items;
     }
 };
+var FileGroup = function (items) {
+    this.items = [];
+    if (items) {
+        this.add(items);
+    }
+};
+FileGroup.prototype = new UniqueGroup();
+FileGroup.prototype.generate = function (cb) {
+    var output = '',
+        me = this,
+        index = 0, read,
+        fs = require('fs');
+    read = function read() {
+        fs.readFile(me.items[index], function (err, data) {
+            if (err) {
+                throw err;
+            }
+            output += data;
+            index += 1;
+            if (index < me.items.length) {
+                read();
+            } else {
+                cb(output);
+            }
+        });
+    };
+    read();
+};
+exports.UniqueGroup = UniqueGroup;
 exports.FileGroup = FileGroup;
