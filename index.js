@@ -1,24 +1,25 @@
 /*global require: true, exports: true*/
-var UniqueGroup = function (items) {
+
+var UniqueGroup = function UniqueGroup (items) {
     this.items = [];
     if (items) {
         this.add(items);
     }
 };
 UniqueGroup.prototype = {
-    add: function (items) {
+    add: function uniqueGroupAdd (items) {
         if (Object.prototype.toString.apply(items) !== '[object Array]') {
             items = [items];
         }
         items.forEach(function (item) {
-            if (item instanceof this.constructor) {
+            if (typeof item === 'object') {
                 item = item.items;
             }
             this.items = this.items.concat(item);
         }.bind(this));
         this._makeUnique();
     },
-    _makeUnique: function () {
+    _makeUnique: function uniqueGroupMakeUniqe () {
         var items = [], hash = {};
         this.items.forEach(function (item) {
             if (!hash[item]) {
@@ -29,14 +30,14 @@ UniqueGroup.prototype = {
         this.items = items;
     }
 };
-var FileGroup = function (items) {
+var FileGroup = function FileGroup (items) {
     this.items = [];
     if (items) {
         this.add(items);
     }
 };
 FileGroup.prototype = new UniqueGroup();
-FileGroup.prototype.generate = function (cb) {
+FileGroup.prototype.generate = function fileGroupGenerate (cb) {
     var output = '',
         me = this,
         index = 0, read,
