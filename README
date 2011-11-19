@@ -1,0 +1,6 @@
+Simple module for nodejs to generate lists, where a list can be a part of
+another list.
+For example, it can be useful if you want to create javascript packages for you
+website. You create packages and you put all of them into one file. You may put
+the same file into several packages, but in the end you want to include it only
+once.
